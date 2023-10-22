@@ -21,6 +21,16 @@ def is_1nf(relation):
     return True
 
 
+def is_2nf(relation, primary_key, dependencies):
+    partial_dependencies_not_found = True
+    for determinant, dependent in dependencies.items():
+        if {determinant}.issubset(primary_key) and {determinant} != set(primary_key):
+            partial_dependencies_not_found = False
+            break
+
+    return partial_dependencies_not_found
+
+
 def first_normalization_form(relation):
     one_flag = is_1nf(relation)
 
@@ -30,4 +40,26 @@ def first_normalization_form(relation):
         for col in relation.columns:
             if relation[col].apply(is_list_or_set).any():
                 relation = relation.explode(col)
+
+        print('RELATION AFTER 1NF')
+        print(relation)
+        print('\n')
         return relation, one_flag
+
+
+def second_normalization_form(relation, primary_key, dependencies):
+    relations = {}
+    two_flag = is_2nf(relation, primary_key, dependencies)
+
+    if two_flag:
+        return relation, two_flag
+    else:
+        print('RELATIONS AFTER 2NF')
+        for determinant, dependent in dependencies.items():
+            cols = [determinant] + dependent
+            relations[determinant] = relation[cols].drop_duplicates(
+            ).reset_index(drop=True)
+            print(relations[determinant])
+
+    print('\n')
+    return relations, two_flag
