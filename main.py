@@ -49,3 +49,10 @@ if max_normalization >= 2:
 
     if two_flag and max_normalization == 2:
         print('Already Normalized to 2NF')
+
+if max_normalization >= 3:
+    three_nf_tables, three_flag = normalizations.third_normalization_form(
+        two_nf_tables, primary_key, dependencies)
+
+    if three_flag and max_normalization == 3:
+        print('Already Normalized to 3NF')

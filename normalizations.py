@@ -31,6 +31,10 @@ def is_2nf(relation, primary_key, dependencies):
     return partial_dependencies_not_found
 
 
+def is_3nf(relations, primary_key, dependencies):
+    return True
+
+
 def first_normalization_form(relation):
     one_flag = is_1nf(relation)
 
@@ -60,6 +64,15 @@ def second_normalization_form(relation, primary_key, dependencies):
             relations[determinant] = relation[cols].drop_duplicates(
             ).reset_index(drop=True)
             print(relations[determinant])
+        print('\n')
+        return relations, two_flag
 
-    print('\n')
-    return relations, two_flag
+
+def third_normalization_form(relations, primary_key, dependencies):
+    three_relations = {}
+    three_flag = is_3nf(relations, primary_key, dependencies)
+
+    if three_flag:
+        return relations, three_flag
+    else:
+        return relations, three_flag
