@@ -4,6 +4,23 @@ def is_list_or_set(item):
     return isinstance(item, (list, set))
 
 
+def is_superkey(relation, determinant):
+    grouped = relation.groupby(
+        list(determinant)).size().reset_index(name='count')
+    return not any(grouped['count'] > 1)
+
+
+def bcnf_decomposition(relation, dependencies):
+    for determinant, dependents in dependencies.items():
+        if set(determinant).issubset(relation.columns) and not is_superkey(relation, determinant):
+            dependent_cols = list(determinant) + dependents
+            new_relation1 = relation[dependent_cols].drop_duplicates()
+            remaining_cols = list(set(relation.columns) - set(dependents))
+            new_relation2 = relation[remaining_cols].drop_duplicates()
+            return [new_relation1, new_relation2]
+    return [relation]
+
+
 def is_1nf(relation):
     if relation.empty:
         return False
@@ -41,6 +58,16 @@ def is_3nf(relations, dependencies):
                 for dependent in dependents:
                     if dependent in non_prime_attributes:
                         return False
+    return True
+
+
+def is_bcnf(relations, primary_key, dependencies):
+    while relations:
+        relation = relations.pop()
+        for determinant, dependents in dependencies.items():
+            if set(determinant).issubset(relation.columns):
+                if not is_superkey(relation, determinant):
+                    return False
     return True
 
 
@@ -98,8 +125,23 @@ def third_normalization_form(relations, primary_key, dependencies):
 
 
 def bc_normalization_form(relations, primary_key, dependencies):
-    bcnf_relations = {}
-    bcnf_flag = False
+    relations = list(relations.values())
+    bcnf_relations = []
+    bcnf_flag = is_bcnf(relations, primary_key, dependencies)
+
+    if bcnf_flag:
+        return relations, bcnf_flag
+    else:
+        print('RELATIONS AFTER BCNF')
+        while relations:
+            relation = relations.pop()
+            bcnf_decomposed_relation = bcnf_decomposition(
+                relation, dependencies)
+            if len(bcnf_decomposed_relation) == 1:
+                bcnf_relations.append(bcnf_decomposed_relation)
+            else:
+                relations.extend(bcnf_decomposed_relation)
+
     return bcnf_relations, bcnf_flag
 
 
