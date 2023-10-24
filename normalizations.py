@@ -21,17 +21,29 @@ def is_1nf(relation):
     return True
 
 
-def is_2nf(relation, primary_key, dependencies):
+def is_2nf(primary_key, dependencies):
     partial_dependencies_not_found = True
     for determinant, dependent in dependencies.items():
-        if {determinant}.issubset(primary_key) and {determinant} != set(primary_key):
+        if set(determinant).issubset(primary_key) and set(determinant) != set(primary_key):
             partial_dependencies_not_found = False
             break
 
     return partial_dependencies_not_found
 
 
-def is_3nf(relations, primary_key, dependencies):
+def is_3nf(relations, dependencies):
+    i = 0
+    keys_as_list = list(dependencies.keys())
+    for relation in relations:
+        attributes = set(relations[relation].columns)
+        non_prime_attributes = attributes - set(keys_as_list[i])
+        i += 1
+
+        for determinant, dependents in dependencies.items():
+            if all(attr in non_prime_attributes for attr in determinant):
+                for dependent in dependents:
+                    if dependent in non_prime_attributes:
+                        return False
     return True
 
 
@@ -53,26 +65,36 @@ def first_normalization_form(relation):
 
 def second_normalization_form(relation, primary_key, dependencies):
     relations = {}
-    two_flag = is_2nf(relation, primary_key, dependencies)
+    two_flag = is_2nf(primary_key, dependencies)
 
     if two_flag:
-        return relation, two_flag
+        relations[primary_key] = relation
+        return relations, two_flag
     else:
         print('RELATIONS AFTER 2NF')
         for determinant, dependent in dependencies.items():
-            cols = [determinant] + dependent
-            relations[determinant] = relation[cols].drop_duplicates(
+            cols = list(determinant) + dependent
+            relations[tuple(determinant)] = relation[cols].drop_duplicates(
             ).reset_index(drop=True)
             print(relations[determinant])
-        print('\n')
+            print('\n')
         return relations, two_flag
 
 
 def third_normalization_form(relations, primary_key, dependencies):
     three_relations = {}
-    three_flag = is_3nf(relations, primary_key, dependencies)
+    three_flag = is_3nf(relations, dependencies)
 
     if three_flag:
         return relations, three_flag
     else:
-        return relations, three_flag
+        print('RELATIONS AFTER 3NF')
+        for relation in relations:
+            for determinant, dependent in dependencies.items():
+                cols = list(determinant) + dependent
+                three_relations[tuple(determinant)] = relations[relation][cols].drop_duplicates(
+                ).reset_index(drop=True)
+                print(three_relations[determinant])
+                print('\n')
+
+        return three_relations, three_flag

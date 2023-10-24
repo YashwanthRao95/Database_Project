@@ -17,7 +17,9 @@ with open('dependencies.txt', 'r') as file:
 dependencies = {}
 for line in lines:
     determinant, dependent = line.split(" -> ")
-    dependencies[determinant] = dependent.split(", ")
+    # Splitting the determinant by comma to make it a list
+    determinant = determinant.split(", ")
+    dependencies[tuple(determinant)] = dependent.split(", ")
 print('DEPENDENCIES')
 print(dependencies)
 print('\n')
@@ -27,6 +29,7 @@ max_normalization = int(input(
 
 # Enter Key
 primary_key = input("Enter Primary Key values separated by comma: ").split(',')
+print('\n')
 
 keys = ()
 for key in primary_key:
@@ -47,12 +50,12 @@ if max_normalization >= 2:
     two_nf_tables, two_flag = normalizations.second_normalization_form(
         one_nf_table, primary_key, dependencies)
 
-    if two_flag and max_normalization == 2:
+    if two_flag and one_flag and max_normalization == 2:
         print('Already Normalized to 2NF')
 
 if max_normalization >= 3:
     three_nf_tables, three_flag = normalizations.third_normalization_form(
         two_nf_tables, primary_key, dependencies)
 
-    if three_flag and max_normalization == 3:
+    if three_flag and two_flag and one_flag and max_normalization == 3:
         print('Already Normalized to 3NF')
