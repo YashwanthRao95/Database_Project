@@ -8,13 +8,10 @@ def is_1nf(relation):
     if relation.empty:
         return False
 
-    # Check if each column has atomic values and values are of the same type
     for column in relation.columns:
         unique_types = relation[column].apply(type).nunique()
         if unique_types > 1:
             return False
-
-        # Check for non-atomic values like list, dict, or set within the columns
         if relation[column].apply(lambda x: isinstance(x, (list, dict, set))).any():
             return False
 
@@ -98,3 +95,21 @@ def third_normalization_form(relations, primary_key, dependencies):
                 print('\n')
 
         return three_relations, three_flag
+
+
+def bc_normalization_form(relations, primary_key, dependencies):
+    bcnf_relations = {}
+    bcnf_flag = False
+    return bcnf_relations, bcnf_flag
+
+
+def fourth_normalization_form(relations, primary_key, dependencies):
+    four_relations = {}
+    four_flag = False
+    return four_relations, four_flag
+
+
+def fivth_normalization_form(relations, primary_key, dependencies):
+    five_relations = {}
+    five_flag = False
+    return five_relations, five_flag

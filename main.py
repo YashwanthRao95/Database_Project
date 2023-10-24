@@ -24,8 +24,10 @@ print('DEPENDENCIES')
 print(dependencies)
 print('\n')
 # Input from the user
-max_normalization = int(input(
-    'Please enter the highest desired level of normalization: '))
+max_normalization = input(
+    'Please enter the highest desired level of normalization (1, 2, 3, B, 4, or 5): ')
+if max_normalization in ["1", "2", "3", "4", "5"]:
+    max_normalization = int(max_normalization)
 
 # Enter Key
 primary_key = input("Enter Primary Key values separated by comma: ").split(',')
@@ -39,23 +41,44 @@ primary_key = keys
 
 input_file = input_parser.input_parser(input_file)
 
-if max_normalization >= 1:
+if max_normalization == 'B' or max_normalization >= 1:
     one_nf_table, one_flag = normalizations.first_normalization_form(
         input_file)
 
     if one_flag and max_normalization == 1:
         print('Already Normalized to 1NF')
 
-if max_normalization >= 2:
+if max_normalization == 'B' or max_normalization >= 2:
     two_nf_tables, two_flag = normalizations.second_normalization_form(
         one_nf_table, primary_key, dependencies)
 
     if two_flag and one_flag and max_normalization == 2:
         print('Already Normalized to 2NF')
 
-if max_normalization >= 3:
+if max_normalization == 'B' or max_normalization >= 3:
     three_nf_tables, three_flag = normalizations.third_normalization_form(
         two_nf_tables, primary_key, dependencies)
 
     if three_flag and two_flag and one_flag and max_normalization == 3:
         print('Already Normalized to 3NF')
+
+if max_normalization == 'B' or max_normalization >= 4:
+    bc_nf_tables, bcnf_flag = normalizations.bc_normalization_form(
+        three_nf_tables, primary_key, dependencies)
+
+    if bcnf_flag and three_flag and two_flag and one_flag and max_normalization == 'B':
+        print('Already Normalized to BCNF')
+
+if not max_normalization == 'B' and max_normalization >= 4:
+    four_nf_tables, four_flag = normalizations.fourth_normalization_form(
+        bc_nf_tables, primary_key, dependencies)
+
+    if four_flag and bcnf_flag and three_flag and two_flag and one_flag and max_normalization == 4:
+        print('Already Normalized to 4NF')
+
+if not max_normalization == 'B' and max_normalization >= 5:
+    five_nf_tables, five_flag = normalizations.fivth_normalization_form(
+        four_nf_tables, primary_key, dependencies)
+
+    if five_flag and four_flag and bcnf_flag and three_flag and two_flag and one_flag and max_normalization == 5:
+        print('Already Normalized to 5NF')
