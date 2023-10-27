@@ -23,6 +23,7 @@ for line in lines:
 print('DEPENDENCIES')
 print(dependencies)
 print('\n')
+
 # Input from the user
 max_normalization = input(
     'Please enter the highest desired level of normalization (1, 2, 3, B, 4, or 5): ')
@@ -30,7 +31,8 @@ if max_normalization in ["1", "2", "3", "4", "5"]:
     max_normalization = int(max_normalization)
 
 # Enter Key
-primary_key = input("Enter Primary Key values separated by comma: ").split(',')
+primary_key = input(
+    "Enter Primary Key values separated by comma: ").split(', ')
 print('\n')
 
 keys = ()

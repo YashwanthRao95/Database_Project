@@ -1,5 +1,4 @@
 # This file is used for all the normalizations
-# A function to check if an item is a list or a set
 def is_list_or_set(item):
     return isinstance(item, (list, set))
 
