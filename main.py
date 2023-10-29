@@ -41,6 +41,27 @@ for key in primary_key:
 
 primary_key = keys
 
+mvd_dependencies = {}
+if max_normalization >= 4:
+    with open('mvd_dependencies.txt', 'r') as file:
+        mvd_lines = [line.strip() for line in file]
+
+    print(mvd_lines)
+
+    for mvd in mvd_lines:
+        determinant, dependent = mvd.split(" ->-> ")
+        determinant = determinant.split(
+            ", ") if ", " in determinant else [determinant]
+        determinant_str = str(determinant)
+        if determinant_str in mvd_dependencies:
+            mvd_dependencies[determinant_str].append(dependent)
+        else:
+            mvd_dependencies[determinant_str] = [dependent]
+
+    print('MULTI-VALUED DEPENDENCIES')
+    print(mvd_dependencies)
+    print('\n')
+
 input_file = input_parser.input_parser(input_file)
 
 if max_normalization == 'B' or max_normalization >= 1:
@@ -73,7 +94,7 @@ if max_normalization == 'B' or max_normalization >= 4:
 
 if not max_normalization == 'B' and max_normalization >= 4:
     four_nf_tables, four_flag = normalizations.fourth_normalization_form(
-        bc_nf_tables, primary_key, dependencies)
+        bc_nf_tables, mvd_dependencies)
 
     if four_flag and bcnf_flag and three_flag and two_flag and one_flag and max_normalization == 4:
         print('Already Normalized to 4NF')

@@ -70,6 +70,27 @@ def is_bcnf(relations, primary_key, dependencies):
     return True
 
 
+def is_4nf(relations, mvd_dependencies):
+    while relations:
+        relation = relations.pop()
+        for determinant, dependents in mvd_dependencies.items():
+            for dependent in dependents:
+                if isinstance(determinant, tuple):
+                    determinant_cols = list(determinant)
+                else:
+                    determinant_cols = [determinant]
+
+                if all(col in relation.columns for col in determinant_cols + [dependent]):
+                    grouped = relation.groupby(determinant_cols)[
+                        dependent].apply(set).reset_index()
+                    if len(grouped) < len(relation):
+                        print(
+                            f"Multi-valued dependency violation: {determinant} ->-> {dependent}")
+                        return False
+
+    return True
+
+
 def first_normalization_form(relation):
     one_flag = is_1nf(relation)
 
@@ -144,13 +165,51 @@ def bc_normalization_form(relations, primary_key, dependencies):
     return bcnf_relations, bcnf_flag
 
 
-def fourth_normalization_form(relations, primary_key, dependencies):
-    four_relations = {}
-    four_flag = False
-    return four_relations, four_flag
+def fourth_normalization_form(relations, mvd_dependencies):
+    four_relations = []
+    four_flag = is_4nf(relations, mvd_dependencies)
+
+    if four_flag:
+        return relations, four_flag
+    else:
+        print('RELATIONS AFTER 4NF')
+        while relations:
+            relation = relations.pop()
+            for determinant, dependents in mvd_dependencies.items():
+                for dependent in dependents:
+                    if isinstance(determinant, tuple):
+                        determinant_cols = list(determinant)
+                    else:
+                        determinant_cols = [determinant]
+
+                    if all(col in relation.columns for col in determinant_cols + [dependent]):
+                        # Check for multi-valued dependency
+                        grouped = relation.groupby(determinant_cols)[
+                            dependent].apply(set).reset_index()
+                        if len(grouped) < len(relation):
+                            # Decomposition
+                            table_1 = relation[determinant_cols +
+                                               [dependent]].drop_duplicates()
+                            table_2 = relation[determinant_cols + [col for col in relation.columns if col not in [
+                                dependent] + determinant_cols]].drop_duplicates()
+
+                            # Update tables list
+                            four_relations.extend([table_1, table_2])
+
+                            break
+                else:
+                    continue
+                break
+            else:
+                four_relations.append(relation)
+
+    if len(four_relations) == len(relations):
+        return four_relations  # All tables are in 4NF
+    else:
+        return fourth_normalization_form(four_relations, mvd_dependencies)
 
 
 def fivth_normalization_form(relations, primary_key, dependencies):
-    five_relations = {}
+    five_relations = []
     five_flag = False
     return five_relations, five_flag
