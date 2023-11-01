@@ -34,7 +34,10 @@ def output_1NF(primary_keys, df):
 def output_2_3(relations):
     for relation in relations:
         primary_keys = relation
-        table_name = "_".join(relation) + '_table'
+        primary_keys = (primary_keys,) if isinstance(
+            primary_keys, str) else primary_keys
+        table_name = "_".join(primary_keys) + '_table'
+
         relation = relations[relation]
 
         # Start creating the SQL query
@@ -44,6 +47,8 @@ def output_2_3(relations):
         for column, dtype in zip(relation.columns, relation.dtypes):
             if column in primary_keys:
                 query += f"  {column} {pd2sql(dtype)} PRIMARY KEY,\n"
+            elif '_fk' in column:
+                query += f" FOREIGN KEY ({column}) REFERENCES {column.replace('_fk','')}_table({column.replace('_fk','')}),\n"
             else:
                 query += f"  {column} {pd2sql(dtype)},\n"
 
@@ -65,6 +70,8 @@ def output_BCNF_4_5(relations):
         for column, dtype in zip(relation.columns, relation.dtypes):
             if column == primary_key:
                 query += f"  {column} {pd2sql(dtype)} PRIMARY KEY,\n"
+            elif '_fk' in column:
+                query += f" FOREIGN KEY ({column}),\n"
             else:
                 query += f"  {column} {pd2sql(dtype)},\n"
 

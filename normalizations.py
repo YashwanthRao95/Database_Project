@@ -178,10 +178,20 @@ def second_normalization_form(relation, primary_key, dependencies):
         return relations, two_flag
     else:
         print('RELATIONS AFTER 2NF')
-        for determinant, dependent in dependencies.items():
-            cols = list(determinant) + dependent
+        dependency_keys = list(dependencies.keys())
+        for determinant, dependents in dependencies.items():
+            modified_dependents = [
+                dep + '_fk' if (dep,) in dependency_keys else dep for dep in dependents]
+
+            cols = list(determinant) + dependents
             relations[tuple(determinant)] = relation[cols].drop_duplicates(
             ).reset_index(drop=True)
+
+            rename_dict = {dep: modified_dep for dep,
+                           modified_dep in zip(dependents, modified_dependents)}
+            relations[tuple(determinant)].rename(
+                columns=rename_dict, inplace=True)
+
             print(relations[determinant])
             print('\n')
 
@@ -220,12 +230,21 @@ def third_normalization_form(relations, primary_key, dependencies):
         return relations, three_flag
     else:
         print('RELATIONS AFTER 3NF')
+        dependency_keys = list(dependencies.keys())
         for relation in relations:
             original_relation = relations[relation]
-            for determinant, dependent in dependencies.items():
-                cols = list(determinant) + dependent
+            for determinant, dependents in dependencies.items():
+                modified_dependents = [
+                    dep + '_fk' if (dep,) in dependency_keys else dep for dep in dependents]
+
+                cols = list(determinant) + dependents
                 three_relations[tuple(determinant)] = relations[relation][cols].drop_duplicates(
                 ).reset_index(drop=True)
+
+                rename_dict = {dep: modified_dep for dep,
+                               modified_dep in zip(dependents, modified_dependents)}
+                three_relations[tuple(determinant)].rename(
+                    columns=rename_dict, inplace=True)
                 print(three_relations[determinant])
                 print('\n')
 
