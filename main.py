@@ -27,9 +27,14 @@ print('\n')
 
 # Input from the user
 max_normalization = input(
-    'Please enter the highest desired level of normalization (1, 2, 3, B, 4, or 5): ')
+    'Choice of the highest normal form to reach (1: 1NF, 2: 2NF, 3: 3NF, B: BCNF, 4: 4NF, 5: 5NF): ')
 if max_normalization in ["1", "2", "3", "4", "5"]:
     max_normalization = int(max_normalization)
+
+# Find the highest normal form of the input relation
+find_high_nf = int(
+    input('Find the highest normal form of the input table? (1: Yes, 2: No): '))
+high_nf = 'Not normalized yet to any normal form'
 
 # Enter Key
 primary_key = input(
@@ -69,64 +74,99 @@ if max_normalization == 'B' or max_normalization >= 1:
     one_nf_table, one_flag = normalizations.first_normalization_form(
         input_file)
 
+    if one_flag:
+        high_nf = 'Highest Normal Form of input table is: 1NF'
+
     if max_normalization == 1:
         if one_flag:
             print('Already Normalized to 1NF')
             print('\n')
 
+        print('OUPUT QUERIES AFTER 1NF:')
+        print('\n')
         output_1NF(primary_key, one_nf_table)
 
 if max_normalization == 'B' or max_normalization >= 2:
     two_nf_tables, two_flag = normalizations.second_normalization_form(
         one_nf_table, primary_key, dependencies)
 
+    if one_flag and two_flag:
+        high_nf = 'Highest Normal Form of input table is: 2NF'
+
     if max_normalization == 2:
         if two_flag and one_flag:
             print('Already Normalized to 2NF')
             print('\n')
 
+        print('OUPUT QUERIES AFTER 2NF:')
+        print('\n')
         output_2_3(two_nf_tables)
 
 if max_normalization == 'B' or max_normalization >= 3:
     three_nf_tables, three_flag = normalizations.third_normalization_form(
         two_nf_tables, primary_key, dependencies)
 
+    if one_flag and two_flag and three_flag:
+        high_nf = 'Highest Normal Form of input table is: 3NF'
+
     if max_normalization == 3:
         if three_flag and two_flag and one_flag:
             print('Already Normalized to 3NF')
             print('\n')
 
+        print('OUPUT QUERIES AFTER 3NF:')
+        print('\n')
         output_2_3(three_nf_tables)
 
 if max_normalization == 'B' or max_normalization >= 4:
     bc_nf_tables, bcnf_flag = normalizations.bc_normalization_form(
         three_nf_tables, primary_key, dependencies)
 
+    if one_flag and two_flag and three_flag and bcnf_flag:
+        high_nf = 'Highest Normal Form of input table is: BCNF'
+
     if max_normalization == 'B':
         if bcnf_flag and three_flag and two_flag and one_flag:
             print('Already Normalized to BCNF')
             print('\n')
 
+        print('OUPUT QUERIES AFTER BCNF:')
+        print('\n')
         output_BCNF_4_5(bc_nf_tables)
 
 if not max_normalization == 'B' and max_normalization >= 4:
     four_nf_tables, four_flag = normalizations.fourth_normalization_form(
         bc_nf_tables, mvd_dependencies)
 
+    if one_flag and two_flag and three_flag and bcnf_flag and four_flag:
+        high_nf = 'Highest Normal Form of input table is: 4NF'
+
     if max_normalization == 4:
         if four_flag and bcnf_flag and three_flag and two_flag and one_flag:
             print('Already Normalized to 4NF')
             print('\n')
 
+        print('OUPUT QUERIES AFTER 4NF:')
+        print('\n')
         output_BCNF_4_5(four_nf_tables)
 
 if not max_normalization == 'B' and max_normalization >= 5:
     five_nf_tables, five_flag = normalizations.fivth_normalization_form(
         four_nf_tables, primary_key, dependencies)
 
+    if one_flag and two_flag and three_flag and bcnf_flag and four_flag and five_flag:
+        high_nf = 'Highest Normal Form of input table is: 5NF'
+
     if max_normalization == 5:
         if five_flag and four_flag and bcnf_flag and three_flag and two_flag and one_flag:
             print('Already Normalized to 5NF')
             print('\n')
 
+        print('OUPUT QUERIES AFTER 5NF:')
+        print('\n')
         output_BCNF_4_5(five_nf_tables)
+
+if find_high_nf == 1:
+    print('\n')
+    print(high_nf)
+    print('\n')
