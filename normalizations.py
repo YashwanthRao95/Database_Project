@@ -56,12 +56,9 @@ def is_2nf(primary_key, dependencies):
 
 
 def is_3nf(relations, dependencies):
-    i = 0
-    keys_as_list = list(dependencies.keys())
     for relation in relations:
         attributes = set(relations[relation].columns)
-        non_prime_attributes = attributes - set(keys_as_list[i])
-        i += 1
+        non_prime_attributes = attributes - set(relation)
 
         for determinant, dependents in dependencies.items():
             if all(attr in non_prime_attributes for attr in determinant):
@@ -173,6 +170,7 @@ def first_normalization_form(relation):
 
 def second_normalization_form(relation, primary_key, dependencies):
     relations = {}
+    original_relation = relation
     two_flag = is_2nf(primary_key, dependencies)
 
     if two_flag:
@@ -186,6 +184,31 @@ def second_normalization_form(relation, primary_key, dependencies):
             ).reset_index(drop=True)
             print(relations[determinant])
             print('\n')
+
+        junction_cols = []
+        relation_name = ''
+        for relation in relations:
+            if set(relation).issubset(primary_key):
+                relation_name += "_".join(relation)
+                junction_cols.append(relation)
+
+        if len(junction_cols) > 1:
+            jun_cols = list(junction_cols)
+            cols = [element for tup in jun_cols for element in tup]
+            temp_df = original_relation[cols].drop_duplicates(
+            ).reset_index(drop=True)
+
+            renamed_cols = [col + '_fk' for col in cols]
+            temp_df.columns = renamed_cols + \
+                [col for col in temp_df.columns if col not in cols]
+
+            temp_df[relation_name] = range(1, len(temp_df) + 1)
+            columns_order = [relation_name] + renamed_cols
+            temp_df = temp_df[columns_order]
+            relations[relation_name] = temp_df
+            print(relations[relation_name])
+            print('\n')
+
         return relations, two_flag
 
 
@@ -198,12 +221,38 @@ def third_normalization_form(relations, primary_key, dependencies):
     else:
         print('RELATIONS AFTER 3NF')
         for relation in relations:
+            original_relation = relations[relation]
             for determinant, dependent in dependencies.items():
                 cols = list(determinant) + dependent
                 three_relations[tuple(determinant)] = relations[relation][cols].drop_duplicates(
                 ).reset_index(drop=True)
                 print(three_relations[determinant])
                 print('\n')
+
+        junction_cols = []
+        relation_name = ''
+        for relation in three_relations:
+            relation_name += "_".join(relation)
+            junction_cols.append(relation)
+
+        print(relation_name)
+
+        if len(junction_cols) > 1:
+            jun_cols = list(junction_cols)
+            cols = [element for tup in jun_cols for element in tup]
+            temp_df = original_relation[cols].drop_duplicates(
+            ).reset_index(drop=True)
+
+            renamed_cols = [col + '_fk' for col in cols]
+            temp_df.columns = renamed_cols + \
+                [col for col in temp_df.columns if col not in cols]
+
+            temp_df[relation_name] = range(1, len(temp_df) + 1)
+            columns_order = [relation_name] + renamed_cols
+            temp_df = temp_df[columns_order]
+            three_relations[relation_name] = temp_df
+            print(three_relations[relation_name])
+            print('\n')
 
         return three_relations, three_flag
 
