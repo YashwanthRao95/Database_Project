@@ -72,7 +72,7 @@ input_file = input_parser.input_parser(input_file)
 
 if max_normalization == 'B' or max_normalization >= 1:
     one_nf_table, one_flag = normalizations.first_normalization_form(
-        input_file)
+        input_file, primary_key)
 
     if one_flag:
         high_nf = 'Highest Normal Form of input table is: 1NF'
@@ -100,7 +100,7 @@ if max_normalization == 'B' or max_normalization >= 2:
 
         print('OUPUT QUERIES AFTER 2NF:')
         print('\n')
-        output_BCNF_4_5(two_nf_tables)
+        output_2_3(two_nf_tables)
 
 if max_normalization == 'B' or max_normalization >= 3:
     three_nf_tables, three_flag = normalizations.third_normalization_form(
@@ -132,7 +132,7 @@ if max_normalization == 'B' or max_normalization >= 4:
 
         print('OUPUT QUERIES AFTER BCNF:')
         print('\n')
-        output_BCNF_4_5(bc_nf_tables)
+        output_2_3(bc_nf_tables)
 
 if not max_normalization == 'B' and max_normalization >= 4:
     four_nf_tables, four_flag = normalizations.fourth_normalization_form(
@@ -148,7 +148,7 @@ if not max_normalization == 'B' and max_normalization >= 4:
 
         print('OUPUT QUERIES AFTER 4NF:')
         print('\n')
-        output_BCNF_4_5(four_nf_tables)
+        output_2_3(four_nf_tables)
 
 if not max_normalization == 'B' and max_normalization >= 5:
     five_nf_tables, five_flag = normalizations.fivth_normalization_form(

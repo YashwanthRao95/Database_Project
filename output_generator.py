@@ -14,7 +14,9 @@ def pd2sql(dtype):
 
 
 def output_1NF(primary_keys, df):
-    table_name = "_".join(primary_keys) + "_table"
+    primary_key = list(df.keys())[0]
+    table_name = "_".join(primary_key) + "_table"
+    df = df[primary_key]
     # Start creating the SQL query
     query = f"CREATE TABLE {table_name} (\n"
 
@@ -32,13 +34,11 @@ def output_1NF(primary_keys, df):
 
 
 def output_2_3(relations):
-    for relation in relations:
-        primary_keys = relation
+    for relation_name, relation in relations.items():
+        primary_keys = relation_name
         primary_keys = (primary_keys,) if isinstance(
             primary_keys, str) else primary_keys
         table_name = "_".join(primary_keys) + '_table'
-
-        relation = relations[relation]
 
         # Start creating the SQL query
         query = f"CREATE TABLE {table_name} (\n"
@@ -59,9 +59,11 @@ def output_2_3(relations):
 
 
 def output_BCNF_4_5(relations):
-    for relation in relations:
-        primary_key = relation.columns[0]
-        table_name = f'{primary_key}_table'
+    for relation_name, relation in relations.items():
+        primary_keys = relation_name
+        primary_keys = (primary_keys,) if isinstance(
+            primary_keys, str) else primary_keys
+        table_name = "_".join(primary_keys) + '_table'
 
         # Start creating the SQL query
         query = f"CREATE TABLE {table_name} (\n"

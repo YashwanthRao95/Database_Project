@@ -80,7 +80,7 @@ def is_3nf(relations, dependencies):
     primary_keys = [key for key in dependencies]
     non_key_attributes = [item for sublist in dependencies.values()
                           for item in sublist]
-    for relation in relations:
+    for relation_name, relation in relations.items():
         for det, dep in dependencies.items():
             if set(det).issubset(set(relation.columns)) and not set(det).issubset(primary_keys) and set(dep).issubset(non_key_attributes):
                 return False
@@ -88,7 +88,7 @@ def is_3nf(relations, dependencies):
 
 
 def is_bcnf(relations, primary_key, dependencies):
-    for relation in relations:
+    for relation_name, relation in relations.items():
         all_attributes = set(relation.columns)
         for det, deps in dependencies.items():
             for dep in deps:
@@ -100,8 +100,7 @@ def is_bcnf(relations, primary_key, dependencies):
 
 
 def is_4nf(relations, mvd_dependencies):
-    for relation in relations:
-        relation = relation[0]
+    for relation_name, relation in relations.items():
         for determinant, dependents in mvd_dependencies.items():
             for dependent in dependents:
                 if isinstance(determinant, tuple):
@@ -121,16 +120,14 @@ def is_4nf(relations, mvd_dependencies):
 
 
 def is_5nf(relations):
-    i = 0
     candidate_keys_dict = {}
-    for relation in relations:
+    for relation_name, relation in relations:
         print(relation)
         user_input = input("Enter the candidate keys (e.g., (A, B), (C, D)): ")
         print('\n')
         tuples = re.findall(r'\((.*?)\)', user_input)
         candidate_keys = [tuple(map(str.strip, t.split(','))) for t in tuples]
-        candidate_keys_dict[i] = candidate_keys
-        i += 1
+        candidate_keys_dict[relation_name] = candidate_keys
 
     print(f'Candidate Keys for tables:')
     print(candidate_keys_dict)
@@ -175,11 +172,13 @@ def is_5nf(relations):
     return True, candidate_keys_dict
 
 
-def first_normalization_form(relation):
+def first_normalization_form(relation, primary_key):
+    relations = {}
     one_flag = is_1nf(relation)
 
     if one_flag:
-        return relation, one_flag
+        relations[primary_key] = relation
+        return relations, one_flag
     else:
         for col in relation.columns:
             if relation[col].apply(is_list_or_set).any():
@@ -188,16 +187,18 @@ def first_normalization_form(relation):
         print('RELATION AFTER 1NF')
         print(relation)
         print('\n')
-        return relation, one_flag
+        relations[primary_key] = relation
+        return relations, one_flag
 
 
 def second_normalization_form(relation, primary_key, dependencies):
-    relations = []
+    relation = relation[primary_key]
+    relations = {}
     rm_cols = []
     two_flag = is_2nf(primary_key, dependencies, relation)
 
     if two_flag:
-        relations.append(relation)
+        relations[primary_key] = relation
         return relations, two_flag
     else:
         print('RELATIONS AFTER 2NF')
@@ -208,23 +209,26 @@ def second_normalization_form(relation, primary_key, dependencies):
             if set(det).issubset(primary_key) and set(det) != set(primary_key):
                 if any(attr in dep for attr in non_prime_attributes):
                     new_relation = relation[list(det) + dep].drop_duplicates()
-                    relations.append(new_relation)
+                    relations[tuple(det)] = new_relation
+                    # relations.append(new_relation)
 
                     for attr in dep:
                         if attr not in det and attr not in rm_cols:
                             rm_cols.append(attr)
 
         relation.drop(columns=rm_cols, inplace=True)
-        relations.append(relation)
+        relations[primary_key] = relation
+        # relations.append(relation)
         for relation in relations:
-            print(relation)
+            print(relations[relation])
             print('\n')
 
         return relations, two_flag
 
 
 def third_normalization_form(relations, primary_key, dependencies):
-    three_relations = []
+    # relations = list(relations.values())
+    three_relations = {}
     three_flag = is_3nf(relations, dependencies)
 
     if three_flag:
@@ -232,7 +236,7 @@ def third_normalization_form(relations, primary_key, dependencies):
     else:
         print('RELATIONS AFTER 3NF')
         print('\n')
-        for relation in relations:
+        for relation_name, relation in relations.items():
             for det, dep in dependencies.items():
                 if set(det).issubset(set(relation.columns)) and not set(dep).issubset(det):
                     new_cols = list(set(det).union(dep))
@@ -246,22 +250,25 @@ def third_normalization_form(relations, primary_key, dependencies):
                         new_table2 = relation[table2_cols].drop_duplicates(
                         ).reset_index(drop=True)
 
-                        three_relations.append(new_table1)
-                        three_relations.append(new_table2)
+                        # three_relations.append(new_table1)
+                        three_relations[tuple(det)] = new_table1
+                        three_relations[relation_name] = new_table2
+                        # three_relations.append(new_table2)
                         break
             else:
-                three_relations.append(relation)
+                # three_relations.append(relation)
+                three_relations[relation_name] = relation
 
         for relation in three_relations:
-            print(relation)
+            print(three_relations[relation])
             print('\n')
 
         return three_relations, three_flag
 
 
 def bc_normalization_form(relations, primary_key, dependencies):
-    bcnf_relations = []
-    bcnf_final = []
+    bcnf_relations = {}
+    bcnf_final = {}
     bcnf_flag = is_bcnf(relations, primary_key, dependencies)
 
     if bcnf_flag:
@@ -269,31 +276,48 @@ def bc_normalization_form(relations, primary_key, dependencies):
     else:
         print('RELATIONS AFTER BCNF')
         print('\n')
-        for relation in relations:
-            bcnf_decomposed_relation = bcnf_decomposition(
-                relation, dependencies)
-            if len(bcnf_decomposed_relation) == 1:
-                bcnf_relations.append(bcnf_decomposed_relation)
-            else:
-                relations.extend(bcnf_decomposed_relation)
+        for relation_name, relation in relations.items():
+            # bcnf_decomposed_relation = bcnf_decomposition(
+            #     relation, dependencies)
+
+            for det, dep in dependencies.items():
+                closure_set = closure(set(det), dependencies)
+                if not closure_set.issuperset(relation.columns):
+                    cols = list(det) + dep
+                    if set(cols).issubset(relation.columns) and not set(cols) == set(relation.columns):
+                        new_table = relation[list(det) + dep].drop_duplicates()
+                        bcnf_relations[tuple(det)] = new_table
+                        # decomposed_tables.append(new_table)
+                        relation = relation.drop(columns=dep)
+
+            # if len(bcnf_relations) == 1:
+            #     bcnf_final.update(bcnf_relations)
+            # else:
+            #     relations.update(bcnf_relations)
+
+            bcnf_relations[relation_name] = relation
+
+            # if not decomposed_tables:
+            #     return [relation]
+            # else:
+            #     return [relation] + decomposed_tables
 
         for rel in bcnf_relations:
-            bcnf_final.append(rel[0])
-            print(rel[0])
+            print(bcnf_relations[rel])
             print('\n')
 
     return bcnf_relations, bcnf_flag
 
 
 def fourth_normalization_form(relations, mvd_dependencies):
-    four_relations = []
+    four_relations = {}
     four_flag = is_4nf(relations, mvd_dependencies)
 
     if four_flag:
         return relations, four_flag
     else:
         print('RELATIONS AFTER 4NF')
-        for relation in relations:
+        for relation_name, relation in relations.items():
             for determinant, dependents in mvd_dependencies.items():
                 for dependent in dependents:
                     if isinstance(determinant, tuple):
@@ -309,18 +333,21 @@ def fourth_normalization_form(relations, mvd_dependencies):
                             # Decomposition
                             table_1 = relation[determinant_cols +
                                                [dependent]].drop_duplicates()
+                            four_relations[tuple(determinant_cols)] = table_1
                             table_2 = relation[determinant_cols + [col for col in relation.columns if col not in [
                                 dependent] + determinant_cols]].drop_duplicates()
+                            four_relations[relation_name] = table_2
 
                             # Update tables list
-                            four_relations.extend([table_1, table_2])
+                            # four_relations.extend([table_1, table_2])
 
                             break
                 else:
                     continue
                 break
             else:
-                four_relations.append(relation)
+                # four_relations.append(relation)
+                four_relations[relation_name] = relation
 
     if len(four_relations) == len(relations):
         return four_relations  # All tables are in 4NF
@@ -328,7 +355,7 @@ def fourth_normalization_form(relations, mvd_dependencies):
         return fourth_normalization_form(four_relations, mvd_dependencies)
 
 
-def decompose_5nf(dataframe, candidate_keys):
+def decompose_5nf(relation_name, dataframe, candidate_keys):
     # Function to project a DataFrame onto a set of attributes
     def project(df, attributes):
         return df[list(attributes)].drop_duplicates().reset_index(drop=True)
@@ -367,18 +394,17 @@ def decompose_5nf(dataframe, candidate_keys):
 
 
 def fivth_normalization_form(relations, primary_key, dependencies):
-    five_relations = []
+    five_relations = {}
     five_flag, candidate_keys_dict = is_5nf(relations)
 
     if five_flag:
         return relations, five_flag
     else:
         print('RELATIONS AFTER 5NF')
-        i = 0
-        for relation in relations:
-            candidate_keys = candidate_keys_dict[i]
-            i += 1
-            decomposed_relations = decompose_5nf(relation, candidate_keys)
+        for relation_name, relation in relations:
+            candidate_keys = candidate_keys_dict[relation_name]
+            decomposed_relations = decompose_5nf(
+                relation_name, relation, candidate_keys)
             five_relations.append(decomposed_relations)
 
     return five_relations, five_flag
