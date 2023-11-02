@@ -55,7 +55,7 @@ if not max_normalization == 'B' and max_normalization >= 4:
     print(mvd_lines)
 
     for mvd in mvd_lines:
-        determinant, dependent = mvd.split(" ->-> ")
+        determinant, dependent = mvd.split(" ->> ")
         determinant = determinant.split(
             ", ") if ", " in determinant else [determinant]
         determinant_str = str(determinant)
