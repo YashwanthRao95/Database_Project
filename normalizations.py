@@ -198,13 +198,15 @@ def second_normalization_form(relation, primary_key, dependencies):
         junction_cols = []
         relation_name = ''
         for relation in relations:
-            if set(relation).issubset(primary_key):
-                relation_name += "_".join(relation)
-                junction_cols.append(relation)
+            relation_set = set(relation)
+            for rel in relation_set:
+                if rel in primary_key:
+                    relation_name += rel
+                    junction_cols.append(rel)
 
         if len(junction_cols) > 1:
-            jun_cols = list(junction_cols)
-            cols = [element for tup in jun_cols for element in tup]
+            cols = set(junction_cols)
+            cols = list(cols)
             temp_df = original_relation[cols].drop_duplicates(
             ).reset_index(drop=True)
 
@@ -251,14 +253,15 @@ def third_normalization_form(relations, primary_key, dependencies):
         junction_cols = []
         relation_name = ''
         for relation in three_relations:
-            relation_name += "_".join(relation)
-            junction_cols.append(relation)
-
-        print(relation_name)
+            relation_set = set(relation)
+            for rel in relation_set:
+                if rel in primary_key:
+                    relation_name += rel
+                    junction_cols.append(rel)
 
         if len(junction_cols) > 1:
-            jun_cols = list(junction_cols)
-            cols = [element for tup in jun_cols for element in tup]
+            cols = set(junction_cols)
+            cols = list(cols)
             temp_df = original_relation[cols].drop_duplicates(
             ).reset_index(drop=True)
 
