@@ -100,7 +100,7 @@ if max_normalization == 'B' or max_normalization >= 2:
 
         print('OUPUT QUERIES AFTER 2NF:')
         print('\n')
-        output_2_3(two_nf_tables)
+        output_BCNF_4_5(two_nf_tables)
 
 if max_normalization == 'B' or max_normalization >= 3:
     three_nf_tables, three_flag = normalizations.third_normalization_form(
