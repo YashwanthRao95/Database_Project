@@ -3,7 +3,7 @@ import pandas as pd
 import csv
 import normalizations
 import input_parser
-from output_generator import output_1NF, output_2_3, output_BCNF_4_5
+from output_generator import output_1NF, output_all_nfs
 
 
 # Reading the input csv file and the dependencies text file
@@ -100,7 +100,7 @@ if max_normalization == 'B' or max_normalization >= 2:
 
         print('OUPUT QUERIES AFTER 2NF:')
         print('\n')
-        output_2_3(two_nf_tables)
+        output_all_nfs(two_nf_tables)
 
 if max_normalization == 'B' or max_normalization >= 3:
     three_nf_tables, three_flag = normalizations.third_normalization_form(
@@ -116,7 +116,7 @@ if max_normalization == 'B' or max_normalization >= 3:
 
         print('OUPUT QUERIES AFTER 3NF:')
         print('\n')
-        output_2_3(three_nf_tables)
+        output_all_nfs(three_nf_tables)
 
 if max_normalization == 'B' or max_normalization >= 4:
     bc_nf_tables, bcnf_flag = normalizations.bc_normalization_form(
@@ -132,7 +132,7 @@ if max_normalization == 'B' or max_normalization >= 4:
 
         print('OUPUT QUERIES AFTER BCNF:')
         print('\n')
-        output_2_3(bc_nf_tables)
+        output_all_nfs(bc_nf_tables)
 
 if not max_normalization == 'B' and max_normalization >= 4:
     four_nf_tables, four_flag = normalizations.fourth_normalization_form(
@@ -148,7 +148,7 @@ if not max_normalization == 'B' and max_normalization >= 4:
 
         print('OUPUT QUERIES AFTER 4NF:')
         print('\n')
-        output_2_3(four_nf_tables)
+        output_all_nfs(four_nf_tables)
 
 if not max_normalization == 'B' and max_normalization >= 5:
     five_nf_tables, five_flag = normalizations.fivth_normalization_form(
@@ -164,7 +164,7 @@ if not max_normalization == 'B' and max_normalization >= 5:
 
         print('OUPUT QUERIES AFTER 5NF:')
         print('\n')
-        output_BCNF_4_5(five_nf_tables)
+        output_all_nfs(five_nf_tables)
 
 if find_high_nf == 1:
     print('\n')

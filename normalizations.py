@@ -121,9 +121,10 @@ def is_4nf(relations, mvd_dependencies):
 
 def is_5nf(relations):
     candidate_keys_dict = {}
-    for relation_name, relation in relations:
+    for relation_name, relation in relations.items():
         print(relation)
-        user_input = input("Enter the candidate keys (e.g., (A, B), (C, D)): ")
+        user_input = input(
+            "Enter the candidate keys for above relation (e.g., (A, B), (C, D)): ")
         print('\n')
         tuples = re.findall(r'\((.*?)\)', user_input)
         candidate_keys = [tuple(map(str.strip, t.split(','))) for t in tuples]
@@ -133,10 +134,8 @@ def is_5nf(relations):
     print(candidate_keys_dict)
     print('\n')
 
-    j = 0
-    for relation in relations:
-        candidate_keys = candidate_keys_dict[j]
-        j += 1
+    for relation_name, relation in relations.items():
+        candidate_keys = candidate_keys_dict[relation_name]
 
         data_tuples = [tuple(row) for row in relation.to_numpy()]
 
