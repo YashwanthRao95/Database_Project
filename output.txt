@@ -1,0 +1,24 @@
+CREATE TABLE StudentID_table (
+  StudentID VARCHAR(255) PRIMARY KEY,
+  FirstName VARCHAR(255),
+  LastName VARCHAR(255)
+);
+CREATE TABLE Course_table (
+  Course VARCHAR(255) PRIMARY KEY,
+  CourseStart VARCHAR(255),
+  CourseEnd VARCHAR(255)
+);
+CREATE TABLE Course_Professor_table (
+ FOREIGN KEY (Course) REFERENCES Course_table(Course),
+ FOREIGN KEY (Professor) REFERENCES Professor_table(Professor),
+  ClassRoom VARCHAR(255)
+);
+CREATE TABLE Professor_table (
+  Professor VARCHAR(255) PRIMARY KEY,
+  ProfessorEmail VARCHAR(255)
+);
+CREATE TABLE StudentID_Course_table (
+ FOREIGN KEY (Course) REFERENCES Course_table(Course),
+  Professor VARCHAR(255),
+ FOREIGN KEY (StudentID) REFERENCES StudentID_table(StudentID)
+);

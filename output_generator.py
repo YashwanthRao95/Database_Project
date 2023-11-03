@@ -27,10 +27,14 @@ def output_1NF(primary_keys, df):
 
     query = query.rstrip(',\n') + "\n);"
 
+    with open('output.txt', 'w') as file:
+        file.write(query)
+
     print(query)
 
 
 def output_all_nfs(relations):
+    queries = []
     for relation_name, relation in relations.items():
         primary_keys = relation_name
         primary_keys = (primary_keys,) if isinstance(
@@ -58,4 +62,11 @@ def output_all_nfs(relations):
 
             query = query.rstrip(',\n') + "\n);"
 
+        queries.append(query)
+
         print(query)
+
+    with open('output.txt', 'w') as file:
+        for query in queries:
+            file.write(query)
+            file.write('\n')
