@@ -9,7 +9,8 @@
 - [Contact](#contact)
 
 ## Objective:
-To develop a program that takes a dataset (relation) and functional dependencies as input normalizes the relations based on the provided functional dependencies, produces SQL queries to generate the normalized database tables, and optionally determines the highest normal form of the input table.
+To develop a program that takes a dataset (relation) and functional dependencies as input normalizes the relations based on the provided functional dependencies, produces SQL queries to generate the normalized database tables, and optionally determines the highest normal form of the input table.</br>
+To know more about normalizations, suggest reading : [Intoduction of Database Normalization - GeeksforGeeks](https://www.geeksforgeeks.org/introduction-of-database-normalization/?ref=lbp)
 
 ## Contributors:
 - Yashwanth Rao, Gujja (yg7bh@umsystem.edu)</br>
@@ -45,6 +46,7 @@ NOTE: Please ensure all the keys are entered in the format mentioned above. It i
 1) It is assumed that the user has python >= 3.9 installed and an environment created to execute this program.
 2) It is assumed that the user has installed the required libraries are pre-installed. (pandas, numpy, etc,.)
 3) It is assumed that the user shall input the required inputs in the format mentioned and will not deviate from it.
+</br>
 NOTE: Please run the default example with the provided key (StudentID, Course), and highest normal form (4) to get acquainted with the workings of this program.
 
 ## Contact
