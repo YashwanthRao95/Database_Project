@@ -35,6 +35,7 @@ NOTE: Please ensure all the keys are entered in the format mentioned above. It i
 2) At every stage, it shall check if the relation follows the normalization form and outputs the normalized tables with data otherwise.
 3) At the required highest normal form, the program shall quit and output the _**'CREATE TABLE <table-name> ...'**_ queries for the normalized tables.
 4) At the very end, based on the user input, the highest normal form of the input table is either displayed or not.
+5) The output SQL CREATE TABLE <table-name> queries of the normalized tables are stored in the _**'output.txt'**_ file
 
 ## Core Components
 1) [main.py](/main.py): This file is the _**main file to be executed**_. All the inputs are redirected accordingly from here.
