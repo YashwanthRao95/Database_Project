@@ -4,8 +4,9 @@
 - [Contributors](#contributors)
 - [Inputs](#inputs)
 - [Outputs](#outputs)
-- [Contributing](#contributing)
-- [License](#license)
+- [Core Components](#core-components)
+- [Assumptions](#assumptions)
+- [Contact](#contact)
 
 ## Objective:
 To develop a program that takes a dataset (relation) and functional dependencies as input normalizes the relations based on the provided functional dependencies, produces SQL queries to generate the normalized database tables, and optionally determines the highest normal form of the input table.
@@ -31,4 +32,20 @@ NOTE: Please ensure all the keys are entered in the format mentioned above. It i
 ## Outputs
 1) The input relation shall pass through each of the normalization forms until it reaches the highest normal form asked for.
 2) At every stage, it shall check if the relation follows the normalization form and outputs the normalized tables with data otherwise.
-3) At the end, 
+3) At the required highest normal form, the program shall quit and output the _**'CREATE TABLE <table-name> ...'**_ queries for the normalized tables.
+4) At the very end, based on the user input, the highest normal form of the input table is either displayed or not.
+
+## Core Components
+1) [main.py](/main.py): This file is the _**main file to be executed**_. All the inputs are redirected accordingly from here.
+2) [input_parser.py](/input_parser.py): This file is used to parse the inputs from the csv file, txt files, and user inputs, for further use in the program.
+3) [normalizations.py](/normalizations.py): This file contains the entire logic of normalizations from 1NF, all to way to 5NF.
+4) [output_generator.py](/output_generator.py): This file is used to generate the required SQL query by taking in the normalized tables as input.
+
+## Assumptions
+1) It is assumed that the user has python >= 3.9 installed and an environment created to execute this program.
+2) It is assumed that the user has installed the required libraries are pre-installed. (pandas, numpy, etc,.)
+3) It is assumed that the user shall input the required inputs in the format mentioned and will not deviate from it.
+NOTE: Please run the default example with the provided key (StudentID, Course), and highest normal form (4) to get acquainted with the workings of this program.
+
+## Contact
+In case of any query regarding the program and its working, please reach out to [yg7bh@umsystem.edu](mailto:yg7bh@umsystem.edu).
