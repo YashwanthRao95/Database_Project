@@ -140,11 +140,9 @@ def is_5nf(relations):
 
         data_tuples = [tuple(row) for row in relation.to_numpy()]
 
-        # Function to project the data tuples onto a set of attributes
         def project(data, attributes):
             return {tuple(row[attr] for attr in attributes) for row in data}
 
-        # Function to check if a set of attributes is a superkey
         def is_superkey(attributes):
             for key in candidate_keys:
                 if set(key).issubset(attributes):
@@ -153,16 +151,13 @@ def is_5nf(relations):
 
         for i in range(1, len(relation.columns)):
             for attrs in combinations(relation.columns, i):
-                # If the attributes form a superkey, then they satisfy any join dependency by definition
                 if is_superkey(attrs):
                     continue
 
-                # Project the data onto the attributes and their complement
                 projected_data = project(data_tuples, attrs)
                 complement_attrs = set(relation.columns) - set(attrs)
                 complement_data = project(data_tuples, complement_attrs)
 
-                # Join the projected data and check if it is equal to the original data
                 joined_data = {(row1 + row2)
                                for row1 in projected_data for row2 in complement_data}
                 if set(data_tuples) != joined_data:
@@ -210,7 +205,6 @@ def second_normalization_form(relation, primary_key, dependencies):
                 if any(attr in dep for attr in non_prime_attributes):
                     new_relation = relation[list(det) + dep].drop_duplicates()
                     relations[tuple(det)] = new_relation
-                    # relations.append(new_relation)
 
                     for attr in dep:
                         if attr not in det and attr not in rm_cols:
@@ -218,7 +212,6 @@ def second_normalization_form(relation, primary_key, dependencies):
 
         relation.drop(columns=rm_cols, inplace=True)
         relations[primary_key] = relation
-        # relations.append(relation)
         for relation in relations:
             print(relations[relation])
             print('\n')
@@ -227,7 +220,6 @@ def second_normalization_form(relation, primary_key, dependencies):
 
 
 def third_normalization_form(relations, primary_key, dependencies):
-    # relations = list(relations.values())
     three_relations = {}
     three_flag = is_3nf(relations, dependencies)
 
@@ -250,13 +242,10 @@ def third_normalization_form(relations, primary_key, dependencies):
                         new_table2 = relation[table2_cols].drop_duplicates(
                         ).reset_index(drop=True)
 
-                        # three_relations.append(new_table1)
                         three_relations[tuple(det)] = new_table1
                         three_relations[relation_name] = new_table2
-                        # three_relations.append(new_table2)
                         break
             else:
-                # three_relations.append(relation)
                 three_relations[relation_name] = relation
 
         for relation in three_relations:
@@ -277,8 +266,6 @@ def bc_normalization_form(relations, primary_key, dependencies):
         print('RELATIONS AFTER BCNF')
         print('\n')
         for relation_name, relation in relations.items():
-            # bcnf_decomposed_relation = bcnf_decomposition(
-            #     relation, dependencies)
 
             for det, dep in dependencies.items():
                 closure_set = closure(set(det), dependencies)
@@ -287,20 +274,9 @@ def bc_normalization_form(relations, primary_key, dependencies):
                     if set(cols).issubset(relation.columns) and not set(cols) == set(relation.columns):
                         new_table = relation[list(det) + dep].drop_duplicates()
                         bcnf_relations[tuple(det)] = new_table
-                        # decomposed_tables.append(new_table)
                         relation = relation.drop(columns=dep)
 
-            # if len(bcnf_relations) == 1:
-            #     bcnf_final.update(bcnf_relations)
-            # else:
-            #     relations.update(bcnf_relations)
-
             bcnf_relations[relation_name] = relation
-
-            # if not decomposed_tables:
-            #     return [relation]
-            # else:
-            #     return [relation] + decomposed_tables
 
         for rel in bcnf_relations:
             print(bcnf_relations[rel])
@@ -326,11 +302,9 @@ def fourth_normalization_form(relations, mvd_dependencies):
                         determinant_cols = [determinant]
 
                     if all(col in relation.columns for col in determinant_cols + [dependent]):
-                        # Check for multi-valued dependency
                         grouped = relation.groupby(determinant_cols)[
                             dependent].apply(set).reset_index()
                         if len(grouped) < len(relation):
-                            # Decomposition
                             table_1 = relation[determinant_cols +
                                                [dependent]].drop_duplicates()
                             four_relations[tuple(determinant_cols)] = table_1
@@ -338,29 +312,23 @@ def fourth_normalization_form(relations, mvd_dependencies):
                                 dependent] + determinant_cols]].drop_duplicates()
                             four_relations[relation_name] = table_2
 
-                            # Update tables list
-                            # four_relations.extend([table_1, table_2])
-
                             break
                 else:
                     continue
                 break
             else:
-                # four_relations.append(relation)
                 four_relations[relation_name] = relation
 
     if len(four_relations) == len(relations):
-        return four_relations  # All tables are in 4NF
+        return four_relations
     else:
         return fourth_normalization_form(four_relations, mvd_dependencies)
 
 
 def decompose_5nf(relation_name, dataframe, candidate_keys):
-    # Function to project a DataFrame onto a set of attributes
     def project(df, attributes):
         return df[list(attributes)].drop_duplicates().reset_index(drop=True)
 
-    # Function to check if a decomposition is lossless
     def is_lossless(df, df1, df2):
         common_columns = set(df1.columns) & set(df2.columns)
         if not common_columns:
@@ -368,20 +336,16 @@ def decompose_5nf(relation_name, dataframe, candidate_keys):
         joined_df = pd.merge(df1, df2, how='inner', on=list(common_columns))
         return df.equals(joined_df)
 
-    # Initialize the list of decomposed tables with the original table
     decomposed_tables = [dataframe]
 
-    # Iterate over each candidate key and try to decompose the table
     for key in candidate_keys:
         new_tables = []
         for table in decomposed_tables:
-            # If the key is a subset of the table's columns, decompose the table
             if set(key).issubset(set(table.columns)):
                 table1 = project(table, key)
                 remaining_columns = set(table.columns) - set(key)
                 table2 = project(table, remaining_columns | set(key))
 
-                # Check if the decomposition is lossless
                 if is_lossless(table, table1, table2):
                     new_tables.extend([table1, table2])
                 else:

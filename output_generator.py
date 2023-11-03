@@ -17,17 +17,14 @@ def output_1NF(primary_keys, df):
     primary_key = list(df.keys())[0]
     table_name = "_".join(primary_key) + "_table"
     df = df[primary_key]
-    # Start creating the SQL query
     query = f"CREATE TABLE {table_name} (\n"
 
-    # Iterate through the DataFrame columns to create the SQL query
     for column, dtype in zip(df.columns, df.dtypes):
         if column in primary_keys:
             query += f"  {column} {pd2sql(dtype)} PRIMARY KEY,\n"
         else:
             query += f"  {column} {pd2sql(dtype)},\n"
 
-    # Remove the last comma and close the query
     query = query.rstrip(',\n') + "\n);"
 
     print(query)
@@ -40,20 +37,26 @@ def output_2_3(relations):
             primary_keys, str) else primary_keys
         table_name = "_".join(primary_keys) + '_table'
 
-        # Start creating the SQL query
-        query = f"CREATE TABLE {table_name} (\n"
+        if table_name.count('_') >= 2:
+            query = f"CREATE TABLE {table_name} (\n"
 
-        # Iterate through the DataFrame columns to create the SQL query
-        for column, dtype in zip(relation.columns, relation.dtypes):
-            if column in primary_keys:
-                query += f"  {column} {pd2sql(dtype)} PRIMARY KEY,\n"
-            elif '_fk' in column:
-                query += f" FOREIGN KEY ({column}) REFERENCES {column.replace('_fk','')}_table({column.replace('_fk','')}),\n"
-            else:
-                query += f"  {column} {pd2sql(dtype)},\n"
+            for column, dtype in zip(relation.columns, relation.dtypes):
+                if column in primary_keys:
+                    query += f" FOREIGN KEY ({column}) REFERENCES {column.replace('_fk','')}_table({column.replace('_fk','')}),\n"
+                else:
+                    query += f"  {column} {pd2sql(dtype)},\n"
 
-        # Remove the last comma and close the query
-        query = query.rstrip(',\n') + "\n);"
+            query = query.rstrip(',\n') + "\n);"
+        else:
+            query = f"CREATE TABLE {table_name} (\n"
+
+            for column, dtype in zip(relation.columns, relation.dtypes):
+                if column in primary_keys:
+                    query += f"  {column} {pd2sql(dtype)} PRIMARY KEY,\n"
+                else:
+                    query += f"  {column} {pd2sql(dtype)},\n"
+
+            query = query.rstrip(',\n') + "\n);"
 
         print(query)
 
@@ -65,19 +68,16 @@ def output_BCNF_4_5(relations):
             primary_keys, str) else primary_keys
         table_name = "_".join(primary_keys) + '_table'
 
-        # Start creating the SQL query
         query = f"CREATE TABLE {table_name} (\n"
 
-        # Iterate through the DataFrame columns to create the SQL query
         for column, dtype in zip(relation.columns, relation.dtypes):
-            if column == primary_key:
+            if column == primary_keys:
                 query += f"  {column} {pd2sql(dtype)} PRIMARY KEY,\n"
             elif '_fk' in column:
                 query += f" FOREIGN KEY ({column}),\n"
             else:
                 query += f"  {column} {pd2sql(dtype)},\n"
 
-        # Remove the last comma and close the query
         query = query.rstrip(',\n') + "\n);"
 
         print(query)
