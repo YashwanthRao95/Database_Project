@@ -14,10 +14,6 @@ To know more about normalizations, suggest reading : [Intoduction of Database No
 
 ## Contributors:
 - Yashwanth Rao, Gujja (yg7bh@umsystem.edu)</br>
-- Amarnath, Narne (anmzm@umsystem.edu)</br>
-- Sravanth Sri Raja, Nimmagadla (snh94@umsystem.edu)</br>
-- Sai Krishna, Puvvalla (sppn8@umsystem.edu)</br>
-- Likith Sai Ram, Imandi (li2nq@umsystem.edu)</br>
 
 ## Inputs
 1) The input relation data must be mentioned in the _**'exampleInputTable.csv'**_ file.
