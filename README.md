@@ -13,7 +13,7 @@ To develop a program that takes a dataset (relation) and functional dependencies
 To know more about normalizations, suggest reading : [Intoduction of Database Normalization - GeeksforGeeks](https://www.geeksforgeeks.org/introduction-of-database-normalization/?ref=lbp)
 
 ## Contributors:
-- Yashwanth Rao, Gujja (yg7bh@umsystem.edu)</br>
+- Yashwanth Rao, Gujja (yashwanthgujja95@gmail.com)</br>
 
 ## Inputs
 1) The input relation data must be mentioned in the _**'exampleInputTable.csv'**_ file.
@@ -47,4 +47,4 @@ NOTE: Please ensure all the keys are entered in the format mentioned above. It i
 NOTE: Please run the default example with the provided key (StudentID, Course), and highest normal form (4) to get acquainted with the workings of this program.
 
 ## Contact
-In case of any query regarding the program and its working, please reach out to [yg7bh@umsystem.edu](mailto:yg7bh@umsystem.edu).
+In case of any query regarding the program and its working, please reach out to [yashwanthgujja95@gmail.com](mailto:yashwanthgujja95@gmail.com).
